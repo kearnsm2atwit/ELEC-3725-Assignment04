@@ -26,6 +26,13 @@ legv8 = {
     "B.LT": "010101001011",
     "B.LTE": "010101001101"
 }
+
+rCodes =  ["ADD", "AND", "ORR", "ADDS", "EOR", "SUB", "LSR", "LSL", "BR", "ANDS", "SUBS"]
+iCodes =  ["ORRI", "EORI", "ADDI", "ANDI", "ADDIS", "SUBI", "SUBIS", "ANDIS"]
+dCodes =  ["STUR", "LDUR"]
+bCodes =  ["B"]
+cbCodes = ["CBZ", "CBNZ", "B.EQ", "B.NE", "B.GT", "B.GTE", "B.LT", "B.LTE"]
+
 ## Function for taking in raw string from file and returning array of each part of the instruction.
 ## Function also needs to strip the commas and Xs from the string as they aren't needed
 ## Used info from: https://docs.python.org/2.5/lib/string-methods.html
