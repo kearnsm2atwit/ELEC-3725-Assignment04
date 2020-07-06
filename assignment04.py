@@ -94,18 +94,51 @@ def rFormat(instruction):
     return returnValue
 
 def iFormat(instruction):
-    pass
+    opcode = leadingZeros(10, legv8[instruction[0]])
+    immediate = leadingZeros(12, instruction[3])
+    rn = leadingZeros(5, instruction[2])
+    rd = leadingZeros(5, instruction[1])
+    returnValue = opcode + " " + immediate + " " + rn + " " + rd
+    return returnValue
 
 def dFormat(instruction):
-    pass
+    opcode = leadingZeros(11, legv8[instruction[0]])
+    address = leadingZeros(9, instruction[3])
+    rn = leadingZeros(5, instruction[2])
+    rt = leadingZeros(5, instruction[1])
+    returnValue = opcode + " " + address + " " + "00" + " " + rn + " " + rt
+    return returnValue
 
 def bFormat(instruction):
-    pass
+    opcode = leadingZeros(6, legv8[instruction[0]])
+    address = leadingZeros(26, instruction[1])
+    returnValue = opcode + " " + address
+    return returnValue
 
 def cbFormat(instruction):
-    pass
+    opcode = leadingZeros(8, legv8[instruction[0]])
+    address = leadingZeros(19, instruction[2])
+    rt = leadingZeros(5, instruction[1])
+    returnValue = opcode + " " + address + " " + rt
+    return returnValue
 
 
+def selectFormat(instruction):
+    for i in range(0, len(rCodes)):
+        if (instruction[0] == rCodes[i]):
+            return rFormat(instruction)
+    for i in range(0, len(iCodes)):
+        if (instruction[0] == iCodes[i]):
+            return iFormat(instruction)
+    for i in range(0, len(dCodes)):
+        if (instruction[0] == dCodes[i]):
+            return dFormat(instruction)
+    for i in range(0, len(bCodes)):
+        if (instruction[0] == bCodes[i]):
+            return iFormat(instruction)
+    for i in range(0, len(cbCodes)):
+        if (instruction[0] == cbCodes[i]):
+            return cbFormat(instruction)
 
 
 ## Need to open, read, and write text files
@@ -116,9 +149,9 @@ code2 = open("code2.txt", "r")
 code3 = open("code3.txt", "r")
 
 
-firstInstruction = setupInstruction(code1)
+firstInstruction = setupInstruction(code2)
 firstInstruction = instructionToBinary(firstInstruction)
-#print(firstInstruction)
+print(firstInstruction)
 
-for i in firstInstruction:
-    print(rFormat(i))
+for i in range(0, len(firstInstruction)):
+    print(selectFormat(firstInstruction[i]))
