@@ -70,14 +70,22 @@ def instructionToBinary(instruction):
 def leadingZeros(length, string, signed):
     ## Do twos complement for signed bin
     if (signed):
-        invertBin = 0xFFFFFFFFFFFF
-        tempString = int(string)
-        bitString = str(length) + "b"
-        print(invertBin)
-        print(bitString)
-        temp_returnValue = (tempString & invertBin)
-        return bin(tempString & invertBin)
-
+        if length == 19:
+            string = str(string)
+            string = int(string, 2)
+            taco = (string ^ 0b1111111111111111111)
+            taco = bin(taco)
+            taco = taco.lstrip('0b')
+            taco = "1" + taco
+            return taco
+        else:
+            string = str(string)
+            string = int(string, 2)
+            taco = (string ^ 0b11111111111111111111111111)
+            taco = bin(taco)
+            taco =taco.lstrip('0b')
+            taco = "1" + taco
+            return taco
     else:
         returnValue = ""
         stringAsList = list(string)
@@ -193,5 +201,5 @@ firstInstruction = instructionToBinary(firstInstruction)
 
 for i in range(0, len(firstInstruction)):
     #selectFormat(firstInstruction[i])
-    print(firstInstruction[i])
+    #print(firstInstruction[i])
     print(selectFormat(firstInstruction[i]))
