@@ -73,19 +73,19 @@ def leadingZeros(length, string, signed):
         if length == 19:
             string = str(string)
             string = int(string, 2)
-            taco = (string ^ 0b1111111111111111111)
-            taco = bin(taco)
-            taco = taco.lstrip('0b')
-            taco = "1" + taco
-            return taco
+            temp = (string ^ 0b1111111111111111111)
+            temp += 1
+            temp = bin(temp)
+            temp = temp.lstrip('0b')
+            return temp
         else:
             string = str(string)
             string = int(string, 2)
-            taco = (string ^ 0b11111111111111111111111111)
-            taco = bin(taco)
-            taco =taco.lstrip('0b')
-            taco = "1" + taco
-            return taco
+            temp = (string ^ 0b11111111111111111111111111)
+            temp += 1
+            temp = bin(temp)
+            temp = temp.lstrip('0b')
+            return temp
     else:
         returnValue = ""
         stringAsList = list(string)
@@ -95,7 +95,6 @@ def leadingZeros(length, string, signed):
         for i in range(0, len(stringAsList)):
             returnValue += stringAsList[i]
         return returnValue
-
 
 def rFormat(instruction):
     if(instruction[0] == "LSL" or instruction[0] == "LSR" or instruction[0] == "BR"):
@@ -144,7 +143,7 @@ def cbFormat(instruction):
         returnValue = opcode + " " + address + " " + rt
     else:
         opcode = leadingZeros(8, legv8[instruction[0]], False)
-        address = leadingZeros(19, instruction[2], True)
+        address = leadingZeros(19, instruction[2], False)
         rt = leadingZeros(5, instruction[1], False)
         returnValue = opcode + " " + address + " " + rt
     return returnValue
@@ -172,17 +171,21 @@ def selectFormat(instruction):
 def firstPass(instructions):
     for i in range(0, len(instructions)):
         if (instructions[i][0] == "Loop:"):
+            count = 0
             j = i
             while(instructions[j][1] != "Loop"):
+                count -= 1
                 j += 1
             instructions[i].pop(0)
-            instructions[j][1] = str(bin(j).lstrip('-0b'))
+            instructions[j][1] = str(bin(count).lstrip('-0b'))
         if (instructions[i][1] == "Exit"):
+            count = 0
             j = i
             while(instructions[j][0] != "Exit:"):
+                count += 1
                 j += 1
             instructions[j].pop(0)
-            instructions[i][1] = str(bin(j).lstrip('0b'))
+            instructions[i][1] = str(bin(count).lstrip('0b'))
     return instructions
 
 
@@ -198,8 +201,37 @@ firstInstruction = setupInstruction(code3)
 firstInstruction = firstPass(firstInstruction)
 firstInstruction = instructionToBinary(firstInstruction)
 
-
 for i in range(0, len(firstInstruction)):
-    #selectFormat(firstInstruction[i])
-    #print(firstInstruction[i])
     print(selectFormat(firstInstruction[i]))
+
+
+def main():
+    code1 = open("code1.txt", "r")
+    out1 = open("code1_dec.txt", "x")
+    instructions = setupInstruction(code1)
+    dec_instructions = firstPass(instructions)
+    bin_instructions = instructionToBinary(dec_instructions)
+    for i in range(0, len(bin_instructions)):
+        out1.write(selectFormat(bin_instructions[i]))
+        out1.write("\n")
+
+
+    code2 = open("code2.txt", "r")
+    out2 = open("code2_dec.txt", "x")
+    instructions = setupInstruction(code2)
+    dec_instructions = firstPass(instructions)
+    bin_instructions = instructionToBinary(dec_instructions)
+    for i in range(0, len(bin_instructions)):
+        out2.write(selectFormat(bin_instructions[i]))
+        out2.write("\n")
+
+    code3 = open("code3.txt", "r")
+    out3 = open("code3_dec.txt", "x")
+    instructions = setupInstruction(code3)
+    dec_instructions = firstPass(instructions)
+    bin_instructions = instructionToBinary(dec_instructions)
+    for i in range(0, len(bin_instructions)):
+        out3.write(selectFormat(bin_instructions[i]))
+        out3.write("\n")
+
+main()
