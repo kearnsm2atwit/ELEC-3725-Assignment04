@@ -19,19 +19,21 @@ legv8 = {
     "CBZ": "10110100",
     "CBNZ": "10110101",
     "B": "000101",
-    "B.EQ": "010101000000",
-    "B.NE": "010101000001",
-    "B.GT": "010101001100",
-    "B.GTE": "010101001010",
-    "B.LT": "010101001011",
-    "B.LTE": "010101001101"
+
+    ## Need to fix b.cond opcodes
+    "B.EQ": "01010100",
+    "B.NE": "01010100",
+    "B.GT": "01010100",
+    "B.GE": "01010100",
+    "B.LT": "01010100",
+    "B.LE": "01010100"
 }
 
 rCodes =  ["ADD", "AND", "ORR", "ADDS", "EOR", "SUB", "LSR", "LSL", "BR", "ANDS", "SUBS"]
 iCodes =  ["ORRI", "EORI", "ADDI", "ANDI", "ADDIS", "SUBI", "SUBIS", "ANDIS"]
 dCodes =  ["STUR", "LDUR"]
 bCodes =  ["B"]
-cbCodes = ["CBZ", "CBNZ", "B.EQ", "B.NE", "B.GT", "B.GTE", "B.LT", "B.LTE"]
+cbCodes = ["CBZ", "CBNZ", "B.EQ", "B.NE", "B.GT", "B.GE", "B.LT", "B.LE"]
 
 ## Function for taking in raw string from file and returning array of each part of the instruction.
 ## Function also needs to strip the commas and Xs from the string as they aren't needed
@@ -57,7 +59,7 @@ def instructionToBinary(instruction):
     for i in range(0, len(instruction)):
         for j in range(1,len(instruction[i])):
             if(instruction[i][j] == "ZR"):
-                instruction[i][j] = "0"
+                instruction[i][j] = "31"
             instruction[i][j] = bin(int(instruction[i][j]))
             instruction[i][j] = instruction[i][j].lstrip('0b')
             if(instruction[i][j] == ''):
@@ -109,6 +111,7 @@ def dFormat(instruction):
     returnValue = opcode + " " + address + " " + "00" + " " + rn + " " + rt
     return returnValue
 
+## Need to fix b.cond and b formats
 def bFormat(instruction):
     opcode = leadingZeros(6, legv8[instruction[0]])
     address = leadingZeros(26, instruction[1])
@@ -141,6 +144,25 @@ def selectFormat(instruction):
             return cbFormat(instruction)
 
 
+## Need function for exit and loop. Parameter is a list of lists
+def firstPass(instructions):
+    for i in range(0, len(instructions)):
+        if (instructions[i][0] == "Loop:"):
+            j = i
+            while(instructions[j][1] != "Loop"):
+                j += 1
+            instructions[i].pop(0)
+            instructions[j][1] = str(bin(j).lstrip('-0b'))
+        if (instructions[i][1] == "Exit"):
+            j = i
+            while(instructions[j][0] != "Exit:"):
+                j += 1
+            instructions[j].pop(0)
+            instructions[i][1] = str(bin(j).lstrip('0b'))
+    return instructions
+## Function to have negative integers
+def twosCompliment(num):
+    pass
 ## Need to open, read, and write text files
 ## https://www.geeksforgeeks.org/reading-writing-text-files-python/
 
@@ -149,9 +171,11 @@ code2 = open("code2.txt", "r")
 code3 = open("code3.txt", "r")
 
 
-firstInstruction = setupInstruction(code2)
+firstInstruction = setupInstruction(code3)
+firstInstruction = firstPass(firstInstruction)
 firstInstruction = instructionToBinary(firstInstruction)
-print(firstInstruction)
+
 
 for i in range(0, len(firstInstruction)):
+    print(firstInstruction[i])
     print(selectFormat(firstInstruction[i]))
