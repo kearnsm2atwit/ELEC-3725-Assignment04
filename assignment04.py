@@ -21,12 +21,12 @@ legv8 = {
     "B": "000101",
 
     ## Need to fix b.cond opcodes
-    "B.EQ": "01010100",
-    "B.NE": "01010100",
-    "B.GT": "01010100",
-    "B.GE": "01010100",
-    "B.LT": "01010100",
-    "B.LE": "01010100"
+    "B.EQ": "0000",
+    "B.NE": "0001",
+    "B.GT": "1100",
+    "B.GE": "1010",
+    "B.LT": "1011",
+    "B.LE": "1101"
 }
 
 rCodes =  ["ADD", "AND", "ORR", "ADDS", "EOR", "SUB", "LSR", "LSL", "BR", "ANDS", "SUBS"]
@@ -67,62 +67,78 @@ def instructionToBinary(instruction):
     return instruction
 
 ## Function to keep leading zeros. Will help with binary codes that are 4 bits but need to be 5 or something similar
-def leadingZeros(length, string):
-    returnValue = ""
-    stringAsList = list(string)
-    numOfZeros = length - len(stringAsList)
-    for i in range(numOfZeros):
-        stringAsList.insert(0, "0")
-    for i in range(0, len(stringAsList)):
-        returnValue += stringAsList[i]
-    return returnValue
+def leadingZeros(length, string, signed):
+    ## Do twos complement for signed bin
+    if (signed):
+        invertBin = 0xFFFFFFFFFFFF
+        tempString = int(string)
+        bitString = str(length) + "b"
+        print(invertBin)
+        print(bitString)
+        temp_returnValue = (tempString & invertBin)
+        return bin(tempString & invertBin)
+
+    else:
+        returnValue = ""
+        stringAsList = list(string)
+        numOfZeros = length - len(stringAsList)
+        for i in range(numOfZeros):
+            stringAsList.insert(0, "0")
+        for i in range(0, len(stringAsList)):
+            returnValue += stringAsList[i]
+        return returnValue
 
 
 def rFormat(instruction):
     if(instruction[0] == "LSL" or instruction[0] == "LSR" or instruction[0] == "BR"):
-        opcode = leadingZeros(11, legv8[instruction[0]])
-        rm = leadingZeros(5, "0")
-        shamt = leadingZeros(6, instruction[3])
-        rn = leadingZeros(5, instruction[2])
-        rd = leadingZeros(5, instruction[1])
+        opcode = leadingZeros(11, legv8[instruction[0]], False)
+        rm = leadingZeros(5, "0", False)
+        shamt = leadingZeros(6, instruction[3], False)
+        rn = leadingZeros(5, instruction[2], False)
+        rd = leadingZeros(5, instruction[1], False)
         returnValue = opcode + " " + rm + " " +  shamt + " " + rn + " " + rd
     else:
-        opcode = leadingZeros(11, legv8[instruction[0]])
-        rm = leadingZeros(5, instruction[3])
-        shamt = leadingZeros(6, "0")
-        rn = leadingZeros(5, instruction[2])
-        rd = leadingZeros(5, instruction[1])
+        opcode = leadingZeros(11, legv8[instruction[0]], False)
+        rm = leadingZeros(5, instruction[3], False)
+        shamt = leadingZeros(6, "0", False)
+        rn = leadingZeros(5, instruction[2], False)
+        rd = leadingZeros(5, instruction[1], False)
         returnValue = opcode + " " + rm + " " +  shamt + " " + rn + " " + rd
     return returnValue
 
 def iFormat(instruction):
-    opcode = leadingZeros(10, legv8[instruction[0]])
-    immediate = leadingZeros(12, instruction[3])
-    rn = leadingZeros(5, instruction[2])
-    rd = leadingZeros(5, instruction[1])
+    opcode = leadingZeros(10, legv8[instruction[0]], False)
+    immediate = leadingZeros(12, instruction[3], False)
+    rn = leadingZeros(5, instruction[2], False)
+    rd = leadingZeros(5, instruction[1], False)
     returnValue = opcode + " " + immediate + " " + rn + " " + rd
     return returnValue
 
 def dFormat(instruction):
-    opcode = leadingZeros(11, legv8[instruction[0]])
-    address = leadingZeros(9, instruction[3])
-    rn = leadingZeros(5, instruction[2])
-    rt = leadingZeros(5, instruction[1])
+    opcode = leadingZeros(11, legv8[instruction[0]], False)
+    address = leadingZeros(9, instruction[3], False)
+    rn = leadingZeros(5, instruction[2], False)
+    rt = leadingZeros(5, instruction[1], False)
     returnValue = opcode + " " + address + " " + "00" + " " + rn + " " + rt
     return returnValue
 
-## Need to fix b.cond and b formats
 def bFormat(instruction):
-    opcode = leadingZeros(6, legv8[instruction[0]])
-    address = leadingZeros(26, instruction[1])
+    opcode = leadingZeros(6, legv8[instruction[0]], False)
+    address = leadingZeros(26, instruction[1], True)
     returnValue = opcode + " " + address
     return returnValue
 
 def cbFormat(instruction):
-    opcode = leadingZeros(8, legv8[instruction[0]])
-    address = leadingZeros(19, instruction[2])
-    rt = leadingZeros(5, instruction[1])
-    returnValue = opcode + " " + address + " " + rt
+    if (instruction[0][0] == "B"):
+        opcode = leadingZeros(8, "01010100", False)
+        address = leadingZeros(19, instruction[1], True)
+        rt = leadingZeros(5, legv8[instruction[0]], False)
+        returnValue = opcode + " " + address + " " + rt
+    else:
+        opcode = leadingZeros(8, legv8[instruction[0]], False)
+        address = leadingZeros(19, instruction[2], True)
+        rt = leadingZeros(5, instruction[1], False)
+        returnValue = opcode + " " + address + " " + rt
     return returnValue
 
 
@@ -138,7 +154,7 @@ def selectFormat(instruction):
             return dFormat(instruction)
     for i in range(0, len(bCodes)):
         if (instruction[0] == bCodes[i]):
-            return iFormat(instruction)
+            return bFormat(instruction)
     for i in range(0, len(cbCodes)):
         if (instruction[0] == cbCodes[i]):
             return cbFormat(instruction)
@@ -160,9 +176,8 @@ def firstPass(instructions):
             instructions[j].pop(0)
             instructions[i][1] = str(bin(j).lstrip('0b'))
     return instructions
-## Function to have negative integers
-def twosCompliment(num):
-    pass
+
+
 ## Need to open, read, and write text files
 ## https://www.geeksforgeeks.org/reading-writing-text-files-python/
 
@@ -177,5 +192,6 @@ firstInstruction = instructionToBinary(firstInstruction)
 
 
 for i in range(0, len(firstInstruction)):
+    #selectFormat(firstInstruction[i])
     print(firstInstruction[i])
     print(selectFormat(firstInstruction[i]))
