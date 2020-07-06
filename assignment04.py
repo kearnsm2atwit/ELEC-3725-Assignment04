@@ -57,10 +57,34 @@ def instructionToBinary(instruction):
                 instruction[i][j] = '0'
     return instruction
 
+## Function to keep leading zeros. Will help with binary codes that are 4 bits but need to be 5 or something similar
+def leadingZeros(length, string):
+    returnValue = ""
+    stringAsList = list(string)
+    numOfZeros = length - len(stringAsList)
+    for i in range(numOfZeros):
+        stringAsList.insert(0, "0")
+    for i in range(0, len(stringAsList)):
+        returnValue += stringAsList[i]
+    return returnValue
 
 
 def rFormat(instruction):
-    pass
+    if(instruction[0] == "LSL" or instruction[0] == "LSR" or instruction[0] == "BR"):
+        opcode = leadingZeros(11, legv8[instruction[0]])
+        rm = leadingZeros(5, "0")
+        shamt = leadingZeros(6, instruction[3])
+        rn = leadingZeros(5, instruction[2])
+        rd = leadingZeros(5, instruction[1])
+        returnValue = opcode + " " + rm + " " +  shamt + " " + rn + " " + rd
+    else:
+        opcode = leadingZeros(11, legv8[instruction[0]])
+        rm = leadingZeros(5, instruction[3])
+        shamt = leadingZeros(6, "0")
+        rn = leadingZeros(5, instruction[2])
+        rd = leadingZeros(5, instruction[1])
+        returnValue = opcode + " " + rm + " " +  shamt + " " + rn + " " + rd
+    return returnValue
 
 def iFormat(instruction):
     pass
@@ -75,17 +99,6 @@ def cbFormat(instruction):
     pass
 
 
-## Function to keep leading zeros. Will help with binary codes that are 4 bits but need to be 5 or something similar
-def leadingZeros(length, string):
-    returnValue = ""
-    stringAsList = list(string)
-    numOfZeros = length - len(stringAsList)
-    for i in range(numOfZeros):
-        stringAsList.insert(0, "0")
-    for i in range(0, len(stringAsList)):
-        returnValue += stringAsList[i]
-    return returnValue
-
 
 
 ## Need to open, read, and write text files
@@ -96,7 +109,9 @@ code2 = open("code2.txt", "r")
 code3 = open("code3.txt", "r")
 
 
-
 firstInstruction = setupInstruction(code1)
 firstInstruction = instructionToBinary(firstInstruction)
-print(firstInstruction)
+#print(firstInstruction)
+
+for i in firstInstruction:
+    print(rFormat(i))
