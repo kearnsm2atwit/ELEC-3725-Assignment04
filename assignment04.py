@@ -1,3 +1,10 @@
+import os
+if os.path.exists("code1_dec.txt"):
+    os.remove("code1_dec.txt")
+if os.path.exists("code2_dec.txt"):
+    os.remove("code2_dec.txt")
+if os.path.exists("code3_dec.txt"):
+    os.remove("code3_dec.txt")
 ## Dictionary of OP-codes
 legv8 = {
     "ADD": "10001011000",
@@ -60,6 +67,7 @@ def instructionToBinary(instruction):
         for j in range(1,len(instruction[i])):
             if(instruction[i][j] == "ZR"):
                 instruction[i][j] = "31"
+            #if(instruction[i][j] )
             instruction[i][j] = bin(int(instruction[i][j]))
             instruction[i][j] = instruction[i][j].lstrip('0b')
             if(instruction[i][j] == ''):
@@ -76,14 +84,16 @@ def leadingZeros(length, string, signed):
             temp = (string ^ 0b1111111111111111111)
             temp += 1
             temp = bin(temp)
+            temp = temp.lstrip('-0b')
             temp = temp.lstrip('0b')
             return temp
-        else:
+        elif length == 26:
             string = str(string)
             string = int(string, 2)
             temp = (string ^ 0b11111111111111111111111111)
             temp += 1
             temp = bin(temp)
+            temp = temp.lstrip('-0b')
             temp = temp.lstrip('0b')
             return temp
     else:
@@ -130,15 +140,25 @@ def dFormat(instruction):
     return returnValue
 
 def bFormat(instruction):
+    #print("branch less than")
+    #print(instruction[1])
     opcode = leadingZeros(6, legv8[instruction[0]], False)
-    address = leadingZeros(26, instruction[1], True)
+    if instruction[1][0] == "-":
+        address = leadingZeros(26, instruction[1], True)
+    else:
+        address = leadingZeros(26, instruction[1], False)
     returnValue = opcode + " " + address
     return returnValue
 
 def cbFormat(instruction):
+    #print("branch greater than")
+    #print(instruction[1])
     if (instruction[0][0] == "B"):
         opcode = leadingZeros(8, "01010100", False)
-        address = leadingZeros(19, instruction[1], True)
+        if instruction[1][0] == "-":
+            address = leadingZeros(19, instruction[1], True)
+        else:
+            address = leadingZeros(19, instruction[1], False)
         rt = leadingZeros(5, legv8[instruction[0]], False)
         returnValue = opcode + " " + address + " " + rt
     else:
@@ -177,7 +197,8 @@ def firstPass(instructions):
                 count -= 1
                 j += 1
             instructions[i].pop(0)
-            instructions[j][1] = str(bin(count).lstrip('-0b'))
+            #print(count)
+            instructions[j][1] = count
         if (instructions[i][1] == "Exit"):
             count = 0
             j = i
@@ -185,25 +206,13 @@ def firstPass(instructions):
                 count += 1
                 j += 1
             instructions[j].pop(0)
-            instructions[i][1] = str(bin(count).lstrip('0b'))
+            #print(count)
+            instructions[i][1] = count
     return instructions
 
 
 ## Need to open, read, and write text files
 ## https://www.geeksforgeeks.org/reading-writing-text-files-python/
-
-code1 = open("code1.txt", "r")
-code2 = open("code2.txt", "r")
-code3 = open("code3.txt", "r")
-
-
-firstInstruction = setupInstruction(code3)
-firstInstruction = firstPass(firstInstruction)
-firstInstruction = instructionToBinary(firstInstruction)
-
-for i in range(0, len(firstInstruction)):
-    print(selectFormat(firstInstruction[i]))
-
 
 def main():
     code1 = open("code1.txt", "r")
