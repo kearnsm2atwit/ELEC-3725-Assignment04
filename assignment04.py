@@ -78,7 +78,7 @@ def leadingZeros(length, string, signed):
             temp = bin(temp)
             temp = temp.lstrip('0b')
             return temp
-        else:
+        elif length == 26:
             string = str(string)
             string = int(string, 2)
             temp = (string ^ 0b11111111111111111111111111)
