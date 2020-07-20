@@ -97,7 +97,6 @@ def decode(IR, type):
         reg[1] = int(IR[2],2)  #shamt      shamt = 1
         reg[2] = int(IR[3],2)  #Rn         rn = 2
         reg[3] = int(IR[4],2)  #Rd         rd = 3
-        print('howdy',int(IR[1]))
     elif type[1] == 'I':              #immediate = 4
         reg[4] = int(IR[1],2)  #immediate  address = 5
         reg[2] = int(IR[2],2)  #Rn         op2 = 6
@@ -127,12 +126,22 @@ def Fetch():    #main
     decode(IR, type)
     if type[1] == 'R':
         rType(type)
+    elif type[1] == 'I':
+        iType(type)
+    elif type[1] == 'D':
+        dType(type)
     printRegs(1)
 def rType(type):
     global reg
     if type[0] == 'ADD':
-        reg[reg[3]] = reg[0] + reg[2]
-        print('hello', reg[3])
+        reg[8] = reg[reg[0]] + reg[reg[2]]
+def iType(type):
+    if type[0] == 'ADDI':
+        reg[8] = reg[reg[2]] + reg[4]
+def dType(type):
+    if type[0] == 'LDUR':
+        reg[8] = reg[reg[2]] + reg[5]
+
 
 
 Fetch()
