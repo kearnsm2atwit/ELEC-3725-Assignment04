@@ -72,18 +72,6 @@ def printRegs(yes):
         if (((i+1)%11 == 0) & (i > 1)):
             print("")
     print("")
-def Fetch():
-    global IR, PC, imem
-    IR = imem[PC]
-    IR = IR.split(" ")
-    PC = PC+1
-    print(IR)
-    print(IR[0])
-    opcode = legv8[IR[0]]
-    type = instructionType(opcode)
-    print(type)
-    type = type.split(" ")
-    decode(IR)
 
 def instructionType(opcode):
     for i in range(0, len(rCodes)):
@@ -101,27 +89,50 @@ def instructionType(opcode):
     for i in range(0, len(cbCodes)):
         if (opcode == cbCodes[i]):
             return (cbCodes[i] + ' CB')
-def decode(IR):
+def decode(IR, type):
+    print(IR)
     global reg
-    if IR[1] == 'R':
-        reg[0] = IR[1]  #Rm         rm = 0
-        reg[1] = IR[2]  #shamt      shamt = 1
-        reg[2] = IR[3]  #Rn         rn = 2
-        reg[3] = IR[4]  #Rd         rd = 3
-    elif IR[1] == 'I':              #immediate = 4
-        reg[4] = IR[1]  #immediate  address = 5
-        reg[2] = IR[2]  #Rn         op2 = 6
-        reg[3] = IR[3]  #Rd         rt = 7
-    elif IR[1] == 'D':
-        reg[5] = IR[1]  #address
-        reg[6] = IR[2]  #op2
-        reg[2] = IR[3]  #Rn
-        reg[7] = IR[4]  #Rt
-    elif IR[1] == 'B':
-        reg[5] = IR[1]  #address
-    elif IR[1] == 'CB':
-        reg[5] = IR[1]  #address
-        reg[7] = IR[2]  #Rt
+    if type[1] == 'R':
+        reg[0] = int(IR[1],2)  #Rm         rm = 0
+        reg[1] = int(IR[2],2)  #shamt      shamt = 1
+        reg[2] = int(IR[3],2)  #Rn         rn = 2
+        reg[3] = int(IR[4],2)  #Rd         rd = 3
+        print('howdy',int(IR[1]))
+    elif type[1] == 'I':              #immediate = 4
+        reg[4] = int(IR[1],2)  #immediate  address = 5
+        reg[2] = int(IR[2],2)  #Rn         op2 = 6
+        reg[3] = int(IR[3],2)  #Rd         rt = 7
+    elif type[1] == 'D':
+        reg[5] = int(IR[1],2)  #address
+        reg[6] = int(IR[2],2)  #op2
+        reg[2] = int(IR[3],2)  #Rn
+        reg[7] = int(IR[4],2)  #Rt
+    elif type[1] == 'B':
+        reg[5] = int(IR[1],2)  #address
+    elif type[1] == 'CB':
+        reg[5] = int(IR[1],2)  #address
+        reg[7] = int(IR[2],2)  #Rt
+
+def Fetch():    #main
+    global IR, PC, imem
+    IR = imem[PC]
+    IR = IR.split(" ")
+    PC = PC+1
+    #print(IR)
+    #print(IR[0])
+    opcode = legv8[IR[0]]
+    type = instructionType(opcode)
+    print(type)
+    type = type.split(" ")
+    decode(IR, type)
+    if type[1] == 'R':
+        rType(type)
+    printRegs(1)
+def rType(type):
+    global reg
+    if type[0] == 'ADD':
+        reg[reg[3]] = reg[0] + reg[2]
+        print('hello', reg[3])
 
 
 Fetch()
