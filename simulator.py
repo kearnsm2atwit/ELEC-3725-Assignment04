@@ -29,8 +29,8 @@ legv8 = {
     "B.LE": "1101"
 }
 
-rCodes =  ["ADD", "AND", "ORR", "ADDS", "EOR", "SUB", "LSR", "LSL", "BR", "ANDS", "SUBS"]
-iCodes =  ["ORRI", "EORI", "ADDI", "ANDI", "ADDIS", "SUBI", "SUBIS", "ANDIS"]
+rCodes =  ["ADD", "AND", "ORR", "EOR", "SUB", "LSR", "LSL", "SUBS"]
+iCodes =  ["ORRI", "ADDI", "ANDI", "SUBI", "SUBIS", "EORI"]
 dCodes =  ["STUR", "LDUR"]
 bCodes =  ["B"]
 cbCodes = ["CBZ", "CBNZ", "B.EQ", "B.NE", "B.GT", "B.GE", "B.LT", "B.LE"]
@@ -130,18 +130,74 @@ def Fetch():    #main
         iType(type)
     elif type[1] == 'D':
         dType(type)
+    elif type[1] == 'B':
+        bType(type)
+    elif type[1] == 'CB':
+        cbType(type)
+    if type[1] == 'D' :
+        accessMem(type)
     printRegs(1)
 def rType(type):
     global reg
     if type[0] == 'ADD':
-        reg[8] = reg[reg[0]] + reg[reg[2]]
+        reg[reg[3]] = reg[reg[0]] + reg[reg[2]]
+    elif type[0] == 'AND':
+        reg[reg[3]] = reg[reg[0]] & reg[reg[2]]
+    elif type[0] == 'ORR':
+        reg[reg[3]] = reg[reg[0]] | reg[reg[2]]
+    elif type[0] == 'EOR':
+        reg[reg[3]] = reg[reg[0]] ^ reg[reg[2]]
+    elif type[0] == 'SUB':
+        reg[reg[3]] = reg[reg[0]] - reg[reg[2]]
+    elif type[0] == 'LSR':
+        reg[reg[3]] = reg[reg[0]] >> reg[1]
+    elif type[0] == 'LSL':
+        reg[reg[3]] = reg[reg[0]] << reg[1]
+    elif type[0] == 'SUBS':
+        pass
 def iType(type):
     if type[0] == 'ADDI':
-        reg[8] = reg[reg[2]] + reg[4]
+        reg[3] = reg[reg[2]] + reg[4]
+    elif type[0] == 'ORRI':
+        reg[3] = reg[reg[2]] | reg[4]
+    elif type[0] == 'EORI':
+        reg[3] = reg[reg[2]] ^ reg[4]
+    elif type[0] == 'ANDI':
+        reg[3] = reg[reg[2]] & reg[4]
+    elif type[0] == 'SUBI':
+        reg[3] = reg[reg[2]] - reg[4]
+    elif type[0] == 'SUBIS':
+        pass
 def dType(type):
     if type[0] == 'LDUR':
         reg[8] = reg[reg[2]] + reg[5]
-
+    elif type[0] == 'STUR':
+        reg[8] = reg[reg[2]] + reg[5]
+def bType(type):
+    if type[0] == 'B':
+        pass
+def cbType(type):
+    if type[0] == 'CBZ':
+        pass
+    elif type[0] == 'CBNZ':
+        pass
+    elif type[0] == 'B.EQ':
+        pass
+    elif type[0] == 'B.NE':
+        pass
+    elif type[0] == 'B.GT':
+        pass
+    elif type[0] == 'B.GE':
+        pass
+    elif type[0] == 'B.LT':
+        pass
+    elif type[0] == 'B.LE':
+        pass
+def accessMem(type):
+    if type[0] == 'LDUR':
+        reg[reg[7]] = dmem[reg[8]]
+    if type[0] == 'STUR':
+        dmem[reg[8]] = reg[reg[7]]
 
 
 Fetch()
