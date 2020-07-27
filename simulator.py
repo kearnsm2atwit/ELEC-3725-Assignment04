@@ -187,7 +187,7 @@ def rType(type):
         reg[reg[3]] = reg[reg[0]] << reg[1]
     elif type[0] == 'SUBS':
         if  (reg[reg[0]] - reg[reg[2]] < 0):
-            reg[8] = -1
+            reg[8] = -1    #holds the branching flags
         elif  (reg[reg[0]] - reg[reg[2]] > 0):
             reg[8] = 1
         elif  (reg[reg[0]] - reg[reg[2]] == 0):
