@@ -190,24 +190,37 @@ def selectFormat(instruction):
 ## Need function for exit and loop. Parameter is a list of lists
 def firstPass(instructions):
     for i in range(0, len(instructions)):
-        if (instructions[i][0] == "Loop:"):
-            count = 0
-            j = i
-            while(instructions[j][1] != "Loop"):
-                count -= 1
-                j += 1
-            instructions[i].pop(0)
-            #print(count)
-            instructions[j][1] = count
-        if (instructions[i][1] == "Exit"):
-            count = 0
-            j = i
-            while(instructions[j][0] != "Exit:"):
-                count += 1
-                j += 1
-            instructions[j].pop(0)
-            #print(count)
-            instructions[i][1] = count
+        try:
+            if (instructions[i][0] == "Loop:"):
+                count = 0
+                j = i
+                while(instructions[j][1] != "Loop"):
+                    count -= 1
+                    j += 1
+                instructions[i].pop(0)
+                #print(count)
+                instructions[j][1] = count
+
+            if (instructions[i][1] == "Exit"):
+                count = 0
+                j = i
+                while(instructions[j][0] != "Exit:"):
+                    count += 1
+                    j += 1
+                del instructions[j]
+                #print(count)
+                instructions[i][1] = count
+            if (instructions[i][2] == "Exit"):
+                count = 0
+                j = i
+                while(instructions[j][0] != "Exit:"):
+                    count += 1
+                    j += 1
+                del instructions[j]
+                #print(count)
+                instructions[i][2] = count
+        except:
+            continue
     return instructions
 
 
