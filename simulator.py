@@ -35,7 +35,7 @@ dCodes =  ["STUR", "LDUR"]
 bCodes =  ["B"]
 cbCodes = ["CBZ", "CBNZ", "B.EQ", "B.NE", "B.GT", "B.GE", "B.LT", "B.LE"]
 
-code1 = open("code1_dec.txt", "r")  #input binary file
+code1 = open("code3_dec.txt", "r")  #input binary file
 lines = 0
 PC = 0
 IR = ""
@@ -106,8 +106,17 @@ def decode(IR, type):
         reg[2] = int(IR[3],2)  #Rn
         reg[7] = int(IR[4],2)  #Rt
     elif type[1] == 'B':
+        temp = IR[1]
+        if temp[0] == '1':
+            temp = int(IR[1],2) - 67108864
+            IR[1] = bin(temp)
         reg[5] = int(IR[1],2)  #address
     elif type[1] == 'CB':
+        print("cb value", IR[1])
+        temp = IR[1]
+        if temp[0] == '1':
+            temp = int(IR[1], 2) - 524288
+            IR[1] = bin(temp)
         reg[5] = int(IR[1],2)  #address
         reg[7] = int(IR[2],2)  #Rt
 
