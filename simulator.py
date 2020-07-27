@@ -29,12 +29,18 @@ legv8 = {
     "B.LE": "1101"
 }
 
+
+## Array lists to keep track of what type each instruction is
 rCodes =  ["ADD", "AND", "ORR", "EOR", "SUB", "LSR", "LSL", "SUBS"]
 iCodes =  ["ORRI", "ADDI", "ANDI", "SUBI", "SUBIS", "EORI"]
 dCodes =  ["STUR", "LDUR"]
 bCodes =  ["B"]
 cbCodes = ["CBZ", "CBNZ", "B.EQ", "B.NE", "B.GT", "B.GE", "B.LT", "B.LE"]
 
+
+
+## Open the output file from assignment04.py
+## assignment04.py outputs binary file given an input 
 code1 = open("code3_dec.txt", "r")  #input binary file
 lines = 0
 PC = 0
@@ -72,6 +78,8 @@ def printRegs(yes):
             print("")
     print("")
 
+
+## Determine what type each opcode is 
 def instructionType(opcode):
     for i in range(0, len(rCodes)):
         if (opcode == rCodes[i]):
@@ -88,6 +96,8 @@ def instructionType(opcode):
     for i in range(0, len(cbCodes)):
         if (opcode == cbCodes[i]):
             return (cbCodes[i] + ' CB')
+
+## Setting up where register values are, loading registers
 def decode(IR, type):
     #print(IR)
     global reg
@@ -120,10 +130,15 @@ def decode(IR, type):
         reg[5] = int(IR[1],2)  #address
         reg[7] = int(IR[2],2)  #Rt
 
+
+## Fetch instructions until no more instructions left
 def Fetch():    #main
     global IR, PC, imem
     printRegs(1)
     print('\n')
+
+    ## This statement is what goes until there are no instructions left
+    ## PC can be changed based on branch instructions
     while PC < len(imem):
         #printRegs(1)
         IR = imem[PC]
@@ -151,6 +166,9 @@ def Fetch():    #main
             accessMem(type)
     print('\n')
     printRegs(0)
+
+## Take care of registers for R-types, I-types, D-types, B-types, CB-types
+
 def rType(type):
     global reg
     if type[0] == 'ADD':
@@ -197,6 +215,9 @@ def dType(type):
         reg[8] = reg[reg[2]] + reg[5]
     elif type[0] == 'STUR':
         reg[8] = reg[reg[2]] + reg[5]
+
+## B type and CB type can change where program counter is based on where the branch goes
+
 def bType(type):
     global PC
     if type[0] == 'B':
