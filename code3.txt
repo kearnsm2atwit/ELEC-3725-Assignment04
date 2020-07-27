@@ -1,4 +1,4 @@
-	ADDI X21, XZR, #0
+	ADDI X21, XZR, #4
 	ADDI X22, XZR, #100	
 	ADDI X23, XZR, #10
 Loop:	SUBI X9,  X21, #4	

@@ -122,6 +122,7 @@ def decode(IR, type):
 
 def Fetch():    #main
     global IR, PC, imem
+    printRegs(1)
     while PC < len(imem):
         IR = imem[PC]
         IR = IR.split(" ")
@@ -170,7 +171,6 @@ def rType(type):
         elif  (reg[reg[0]] - reg[reg[2]] == 0):
             reg[8] = 0
 def iType(type):
-    print("ran i type instruction")
     if type[0] == 'ADDI':
         reg[reg[3]] = reg[reg[2]] + reg[4]
     elif type[0] == 'ORRI':
@@ -194,25 +194,46 @@ def dType(type):
     elif type[0] == 'STUR':
         reg[8] = reg[reg[2]] + reg[5]
 def bType(type):
+    global PC
     if type[0] == 'B':
-        pass
+        PC = PC + reg[5]
 def cbType(type):
+    global PC
     if type[0] == 'CBZ':
-        pass
+        print("")
+        print("")
+        print("")
+        print("")
+        print("")
+        print("SUBI", reg[reg[9]], "=", reg[21], "-", reg[4])
+        print("")
+        print("")
+        print("")
+        print("")
+
+        if reg[reg[7]] == 0:
+            PC = PC + reg[5]
     elif type[0] == 'CBNZ':
-        pass
+        if reg[7] != 0:
+            PC = PC + reg[5]
     elif type[0] == 'B.EQ':
-        pass
+        if reg[8] == 0:
+            PC = PC + reg[5]
     elif type[0] == 'B.NE':
-        pass
+        if reg[8] != 0:
+            PC = PC + reg[5]
     elif type[0] == 'B.GT':
-        pass
+        if reg[8] == 1:
+            PC = PC + reg[5]
     elif type[0] == 'B.GE':
-        pass
+        if reg[8] == 1 or reg[8] == 0:
+            PC = PC + reg[5]
     elif type[0] == 'B.LT':
-        pass
+        if reg[8] == -1:
+            PC = PC + reg[5]
     elif type[0] == 'B.LE':
-        pass
+        if reg[8] == -1 or reg[8] == 0:
+            PC = PC + reg[5]
 def accessMem(type):
     if type[0] == 'LDUR':
         reg[reg[7]] = dmem[reg[8]]
