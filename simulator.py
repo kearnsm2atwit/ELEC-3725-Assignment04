@@ -89,14 +89,14 @@ def instructionType(opcode):
         if (opcode == cbCodes[i]):
             return (cbCodes[i] + ' CB')
 def decode(IR, type):
-    print(IR)
+    #print(IR)
     global reg
     if type[1] == 'R':
         reg[0] = int(IR[1],2)  #Rm         rm = 0
         reg[1] = int(IR[2],2)  #shamt      shamt = 1
         reg[2] = int(IR[3],2)  #Rn         rn = 2
         reg[3] = int(IR[4],2)  #Rd         rd = 3
-    elif type[1] == 'I':       #immediate = 4
+    elif type[1] == 'I':                  #immediate = 4
         reg[4] = int(IR[1],2)  #immediate  address = 5
         reg[2] = int(IR[2],2)  #Rn         op2 = 6
         reg[3] = int(IR[3],2)  #Rd         rt = 7
@@ -108,14 +108,14 @@ def decode(IR, type):
     elif type[1] == 'B':
         temp = IR[1]
         if temp[0] == '1':
-            temp = int(IR[1],2) - 67108864
+            temp = int(IR[1],2) - 67108865
             IR[1] = bin(temp)
         reg[5] = int(IR[1],2)  #address
     elif type[1] == 'CB':
-        print("cb value", IR[1])
+        #print("cb value", IR[1])
         temp = IR[1]
         if temp[0] == '1':
-            temp = int(IR[1], 2) - 524288
+            temp = int(IR[1], 2) - 524289
             IR[1] = bin(temp)
         reg[5] = int(IR[1],2)  #address
         reg[7] = int(IR[2],2)  #Rt
@@ -123,7 +123,9 @@ def decode(IR, type):
 def Fetch():    #main
     global IR, PC, imem
     printRegs(1)
+    print('\n')
     while PC < len(imem):
+        #printRegs(1)
         IR = imem[PC]
         IR = IR.split(" ")
         PC = PC+1
@@ -131,9 +133,10 @@ def Fetch():    #main
         #print(IR[0])
         opcode = legv8[IR[0]]
         type = instructionType(opcode)
-        print(type)
+        #print(type)
         type = type.split(" ")
         decode(IR, type)
+        print("Executing", type[0])
         if type[1] == 'R':
             rType(type)
         elif type[1] == 'I':
@@ -146,7 +149,8 @@ def Fetch():    #main
             cbType(type)
         if type[1] == 'D' :
             accessMem(type)
-    printRegs(1)
+    print('\n')
+    printRegs(0)
 def rType(type):
     global reg
     if type[0] == 'ADD':
@@ -200,17 +204,6 @@ def bType(type):
 def cbType(type):
     global PC
     if type[0] == 'CBZ':
-        print("")
-        print("")
-        print("")
-        print("")
-        print("")
-        print("SUBI", reg[reg[9]], "=", reg[21], "-", reg[4])
-        print("")
-        print("")
-        print("")
-        print("")
-
         if reg[reg[7]] == 0:
             PC = PC + reg[5]
     elif type[0] == 'CBNZ':
