@@ -46,9 +46,8 @@ reg = [0]
 for i in range(31):
     reg.append(0)
 #print(len(reg))
-dmem = [0]
-for i in range(9):
-    dmem.append(0)
+dmem = [0,0,0,0,0,0,0,0,0,0]
+#       0 1 2 3 4 5 6 7 8 9 use this for presetting dmem values
 #print(dmem, len(dmem))
 imem = ["0"]
 imem[0] = code1.readline()
@@ -97,7 +96,7 @@ def decode(IR, type):
         reg[1] = int(IR[2],2)  #shamt      shamt = 1
         reg[2] = int(IR[3],2)  #Rn         rn = 2
         reg[3] = int(IR[4],2)  #Rd         rd = 3
-    elif type[1] == 'I':              #immediate = 4
+    elif type[1] == 'I':       #immediate = 4
         reg[4] = int(IR[1],2)  #immediate  address = 5
         reg[2] = int(IR[2],2)  #Rn         op2 = 6
         reg[3] = int(IR[3],2)  #Rd         rt = 7
