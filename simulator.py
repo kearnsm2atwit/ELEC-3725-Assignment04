@@ -113,28 +113,29 @@ def decode(IR, type):
 
 def Fetch():    #main
     global IR, PC, imem
-    IR = imem[PC]
-    IR = IR.split(" ")
-    PC = PC+1
-    #print(IR)
-    #print(IR[0])
-    opcode = legv8[IR[0]]
-    type = instructionType(opcode)
-    print(type)
-    type = type.split(" ")
-    decode(IR, type)
-    if type[1] == 'R':
-        rType(type)
-    elif type[1] == 'I':
-        iType(type)
-    elif type[1] == 'D':
-        dType(type)
-    elif type[1] == 'B':
-        bType(type)
-    elif type[1] == 'CB':
-        cbType(type)
-    if type[1] == 'D' :
-        accessMem(type)
+    while PC < len(imem):
+        IR = imem[PC]
+        IR = IR.split(" ")
+        PC = PC+1
+        #print(IR)
+        #print(IR[0])
+        opcode = legv8[IR[0]]
+        type = instructionType(opcode)
+        print(type)
+        type = type.split(" ")
+        decode(IR, type)
+        if type[1] == 'R':
+            rType(type)
+        elif type[1] == 'I':
+            iType(type)
+        elif type[1] == 'D':
+            dType(type)
+        elif type[1] == 'B':
+            bType(type)
+        elif type[1] == 'CB':
+            cbType(type)
+        if type[1] == 'D' :
+            accessMem(type)
     printRegs(1)
 def rType(type):
     global reg
@@ -147,26 +148,37 @@ def rType(type):
     elif type[0] == 'EOR':
         reg[reg[3]] = reg[reg[0]] ^ reg[reg[2]]
     elif type[0] == 'SUB':
-        reg[reg[3]] = reg[reg[0]] - reg[reg[2]]
+        reg[reg[3]] = reg[reg[2]] - reg[reg[0]]
     elif type[0] == 'LSR':
         reg[reg[3]] = reg[reg[0]] >> reg[1]
     elif type[0] == 'LSL':
         reg[reg[3]] = reg[reg[0]] << reg[1]
     elif type[0] == 'SUBS':
-        pass
+        if  (reg[reg[0]] - reg[reg[2]] < 0):
+            reg[8] = -1
+        elif  (reg[reg[0]] - reg[reg[2]] > 0):
+            reg[8] = 1
+        elif  (reg[reg[0]] - reg[reg[2]] == 0):
+            reg[8] = 0
 def iType(type):
+    print("ran i type instruction")
     if type[0] == 'ADDI':
-        reg[3] = reg[reg[2]] + reg[4]
+        reg[reg[3]] = reg[reg[2]] + reg[4]
     elif type[0] == 'ORRI':
-        reg[3] = reg[reg[2]] | reg[4]
+        reg[reg[3]] = reg[reg[2]] | reg[4]
     elif type[0] == 'EORI':
-        reg[3] = reg[reg[2]] ^ reg[4]
+        reg[reg[3]] = reg[reg[2]] ^ reg[4]
     elif type[0] == 'ANDI':
-        reg[3] = reg[reg[2]] & reg[4]
+        reg[reg[3]] = reg[reg[2]] & reg[4]
     elif type[0] == 'SUBI':
-        reg[3] = reg[reg[2]] - reg[4]
+        reg[reg[3]] = reg[reg[2]] - reg[4]
     elif type[0] == 'SUBIS':
-        pass
+        if (reg[reg[0]] - reg[4] < 0):
+            reg[8] = -1
+        elif (reg[reg[0]] - reg[4] > 0):
+            reg[8] = 1
+        elif (reg[reg[0]] - reg[4] == 0):
+            reg[8] = 0
 def dType(type):
     if type[0] == 'LDUR':
         reg[8] = reg[reg[2]] + reg[5]
